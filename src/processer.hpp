@@ -7,6 +7,8 @@
 #include "facefinder.hpp"
 #include "imgparser.hpp"
 #include "orientationdetector.hpp"
+#include "orientationdetector1.hpp"
+#include "orientationdetector2.hpp"
 #include "decisiontaker.hpp"
 
 using namespace cv;
@@ -18,19 +20,24 @@ class Processer : public ImgParser
 {
 private:
 	FaceFinder faceFinder;
-	OrientationDetector orientationDetector;
+	list<OrientationDetector*> orientationDetectors;
 public:
 	Processer()
 	{
+		orientationDetectors.push_back(new OrientationDetector1());
+		orientationDetectors.push_back(new OrientationDetector2());
 	}
 	~Processer()
 	{
+		for (list<OrientationDetector*>::iterator it = orientationDetectors.begin(); it != orientationDetectors.end(); ++it)
+			delete *it;
 	}
 	void Run()
 	{
 		/* - - - - - Training - - - - - - - - - - - - - - - - - - - - */
 		faceFinder.Train();
-		orientationDetector.Train();
+		for (list<OrientationDetector*>::iterator it = orientationDetectors.begin(); it != orientationDetectors.end(); ++it)
+			(*it)->Train();
 
 		/* - - - - - Processing - - - - - - - - - - - - - - - - - - - - */
 		int nbImg = 0;
@@ -47,7 +54,11 @@ public:
 			faceFinder.FindFaces(preprocessedImage, faces);
 
 			// Detect faces orientation
-			orientationDetector.DetectOrientation(image, faces);
+			for (list<OrientationDetector*>::iterator it = orientationDetectors.begin(); it != orientationDetectors.end(); ++it)
+			{
+				for (Faces::iterator itFace = faces.begin(); itFace != faces.end(); ++itFace)
+					(*it)->DetectOrientation(image, *itFace);
+			}
 
 			// Decision taking
 			for (Faces::iterator it = faces.begin(); it != faces.end(); ++it)

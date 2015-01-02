@@ -15,14 +15,14 @@ using namespace std;
 class OrientationDetector : public ImgParser
 {
 public:
-	void Train()
+	OrientationDetector()
 	{
-
 	}
-	void DetectOrientation(const Mat& mat, Faces& faces)
+	virtual ~OrientationDetector()
 	{
-
 	}
+	virtual void Train() = 0;
+	virtual void DetectOrientation(const Mat& mat, Face& face) = 0;
 };
 
 #endif
