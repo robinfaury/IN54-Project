@@ -35,9 +35,11 @@ public:
 	void Run()
 	{
 		/* - - - - - Training - - - - - - - - - - - - - - - - - - - - */
+		cout << "Training..." << endl;
 		faceFinder.Train();
 		for (list<OrientationDetector*>::iterator it = orientationDetectors.begin(); it != orientationDetectors.end(); ++it)
 			(*it)->Train();
+		cout << "Training done" << endl << endl;
 
 		/* - - - - - Processing - - - - - - - - - - - - - - - - - - - - */
 		int nbImg = 0;
@@ -45,15 +47,18 @@ public:
 		while (DigFolder("images", image))
 		{
 			// Preprocess
+			cout << "Preprocessing" << endl;
 			preprocessedImage = image;
 			Preprocessing::Preprocess(preprocessedImage);
 			cvtColor(preprocessedImage, image, COLOR_GRAY2RGB);
 
 			// Find faces
+			cout << "Finding faces" << endl;
 			Faces faces;
 			faceFinder.FindFaces(preprocessedImage, faces);
 
 			// Detect faces orientation
+			cout << "Detecting orientations" << endl;
 			for (list<OrientationDetector*>::iterator it = orientationDetectors.begin(); it != orientationDetectors.end(); ++it)
 			{
 				for (Faces::iterator itFace = faces.begin(); itFace != faces.end(); ++itFace)
@@ -61,29 +66,27 @@ public:
 			}
 
 			// Decision taking
+			cout << "Taking decisions:" << endl;
 			for (Faces::iterator it = faces.begin(); it != faces.end(); ++it)
 			{
-				cout << "Face located at " << it->center.x << ", " << it->center.y << " is ";
 				Verdict verdict = DecisionTaker::Decide(*it);
+
+				// Display
+				cout << " - Face located at " << it->boundingBox.x << ", " << it->boundingBox.y << " is ";
 				if (verdict == Verdict::LOOKING_AT_THE_CAMERA)
 				{
-					circle(image, it->center, it->radius, Scalar(0, 255, 0, 1), 1, 8, 0);
+					rectangle(image, it->boundingBox, Scalar(0, 255, 0, 1), it->reliabilityFactor, 8, 0);
 					cout << "looking at the camera" << endl;
 				}
 				else if (verdict == Verdict::NOT_LOOKING_AT_THE_CAMERA)
 				{
-					circle(image, it->center, it->radius, Scalar(0, 0, 255, 1), 1, 8, 0);
+					rectangle(image, it->boundingBox, Scalar(0, 0, 255, 1), it->reliabilityFactor, 8, 0);
 					cout << "not looking at the camera" << endl;
-				}
-				else if (verdict == Verdict::TOO_FAR)
-				{
-					circle(image, it->center, it->radius, Scalar(255, 0, 0, 1), 1, 8, 0);
-					cout << "too far" << endl;
 				}
 			}
 
 			// Display
-			cout << "Processing done" << endl;
+			cout << "Processing done" << endl << endl;
 			namedWindow("Display Image", WINDOW_AUTOSIZE);
 			imshow("Display Image", image);
 			waitKey(0);

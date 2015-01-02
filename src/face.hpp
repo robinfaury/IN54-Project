@@ -16,11 +16,11 @@ using namespace std;
 class Face
 {
 public:
-	Point center;
-	int radius;
+	Rect boundingBox;
 	Orientation orientation;
+	int reliabilityFactor;
 public:
-	Face(Point middle, int halfDiameter) : center(middle), radius(halfDiameter)
+	Face(Rect& rect) : boundingBox(rect), reliabilityFactor(1)
 	{
 
 	}
