@@ -1,22 +1,15 @@
-#include <stdio.h>
-#include <opencv2/opencv.hpp>
+#include <iostream>
+#include "processer.hpp"
 
 using namespace cv;
+using namespace std;
 
-int main(int argc, char** argv )
+int main(int argc, char** argv)
 {
-    Mat image;
-    image = imread( "images/test.jpg", 1 );
+	Processer processer;
+	processer.Run();
 
-    if ( !image.data )
-    {
-        printf("No image data \n");
-        return -1;
-    }
-    namedWindow("Display Image", WINDOW_AUTOSIZE );
-    imshow("Display Image", image);
-
-    waitKey(0);
-
-    return 0;
+	cout << "Hit enter to quit" << endl;
+	cin.get();
+	return 0;
 }
