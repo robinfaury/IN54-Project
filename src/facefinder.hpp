@@ -22,13 +22,15 @@ public:
 	void Train()
 	{
 		faceClassifiers.push_back(CascadeClassifier());
-		faceClassifiers.back().load("data/haarcascade_frontalface_default.xml");
-		faceClassifiers.push_back(CascadeClassifier());
 		faceClassifiers.back().load("data/haarcascade_frontalface_alt.xml");
 		faceClassifiers.push_back(CascadeClassifier());
-		faceClassifiers.back().load("data/haarcascade_frontalface_alt2.xml");
-		faceClassifiers.push_back(CascadeClassifier());
-		faceClassifiers.back().load("data/haarcascade_frontalface_alt_tree.xml");
+		faceClassifiers.back().load("data/haarcascade_eye.xml");
+		//faceClassifiers.push_back(CascadeClassifier());
+		//faceClassifiers.back().load("data/haarcascade_frontalface_alt_tree.xml");
+		//faceClassifiers.push_back(CascadeClassifier());
+		//faceClassifiers.back().load("data/haarcascade_frontalface_alt2.xml");
+		//faceClassifiers.push_back(CascadeClassifier());
+		//faceClassifiers.back().load("data/haarcascade_frontalface_default.xml");
 		faceClassifiers.push_back(CascadeClassifier());
 		faceClassifiers.back().load("data/haarcascade_profileface.xml");
 	}
@@ -39,10 +41,10 @@ public:
 		vector<Rect> objects;
 		for (vector<CascadeClassifier>::iterator faceClassifier = faceClassifiers.begin(); faceClassifier != faceClassifiers.end(); ++faceClassifier)
 		{
-			faceClassifier->detectMultiScale(src, objects);
+			faceClassifier->detectMultiScale(src, objects,1.1,4);
 			for (vector<Rect>::iterator it = objects.begin(); it != objects.end(); ++it)
 			{
-				if (it->width > 40) // Minimum square size, else it's false positive or too far
+				if (it->width > 30) // Minimum square size, else it's false positive or too far
 				{
 					Faces::iterator intersectionFound = faces.end();
 					for (Faces::iterator face = faces.begin(); face != faces.end(); ++face)

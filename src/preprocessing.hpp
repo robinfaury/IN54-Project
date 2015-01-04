@@ -6,6 +6,8 @@
 #include <iostream>
 #include "str.hpp"
 
+#define M_PI 3.14159265359
+
 using namespace cv;
 using namespace std;
 
@@ -26,9 +28,11 @@ public:
 	}
 	static void Preprocess(Mat& mat)
 	{
-		ResizeByWidth(mat, 1000);
+		ResizeByWidth(mat, 500);
 
 		cvtColor(mat, mat, COLOR_BGR2GRAY);
+
+		
 	}
 };
 
