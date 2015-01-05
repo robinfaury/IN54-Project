@@ -8,6 +8,7 @@
 #include <thread>
 
 #include "facefinder.hpp"
+#include "eyefinder.hpp"
 #include "imgparser.hpp"
 #include "orientationdetector.hpp"
 #include "orientationdetector1.hpp"
@@ -23,6 +24,7 @@ class Processer : public ImgParser
 {
 private:
 	FaceFinder faceFinder;
+	EyeFinder eyeFinder;
 	list<OrientationDetector*> orientationDetectors;
 public:
 	Processer()
@@ -71,10 +73,15 @@ public:
 				Preprocessing::Preprocess(preprocessedImage, 5);
 
 				Faces newFaces;
-			
+				
 				// Find faces
 				cout << "Finding faces" << endl;
 				faceFinder.FindFaces(preprocessedImage, newFaces);
+
+				// Find eyes
+				cout << "Finding eyes" << endl;
+				for (Faces::iterator it = faces.begin(); it != faces.end(); ++it)
+					eyeFinder.FindEyes(preprocessedImage, *it);
 				cvtColor(preprocessedImage, imageToShow, COLOR_GRAY2RGB);
 
 				//identify redundancy
