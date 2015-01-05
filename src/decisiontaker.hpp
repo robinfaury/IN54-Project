@@ -11,16 +11,26 @@ using namespace std;
 
 // Contains the algorithm taking the decision to set a state on a face from its extracted data
 
-enum Verdict { LOOKING_AT_THE_CAMERA, NOT_LOOKING_AT_THE_CAMERA };
+enum VerdictDetection { IS_A_FACE, IS_NOT_A_FACE };
+enum VerdictLooking { LOOKING_AT_THE_CAMERA, NOT_LOOKING_AT_THE_CAMERA };
 
 class DecisionTaker
 {
 public:
-	static Verdict Decide(Face& face)
+	static VerdictDetection DecideDetection(Face& face)
 	{
-		Verdict verdict = Verdict::NOT_LOOKING_AT_THE_CAMERA;
+		VerdictDetection verdict = VerdictDetection::IS_NOT_A_FACE;
+		if (face.reliabilityFactor > 5)
+			verdict = VerdictDetection::IS_A_FACE;
+
+		return verdict;
+	}
+
+	static VerdictLooking DecideLooking(Face& face)
+	{
+		VerdictLooking verdict = VerdictLooking::NOT_LOOKING_AT_THE_CAMERA;
 		if (rand() % 2 == 0)
-			verdict = Verdict::LOOKING_AT_THE_CAMERA;
+			verdict = VerdictLooking::LOOKING_AT_THE_CAMERA;
 
 		return verdict;
 	}

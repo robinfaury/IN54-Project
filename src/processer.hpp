@@ -48,14 +48,15 @@ public:
 
 		/* - - - - - Processing - - - - - - - - - - - - - - - - - - - - */
 		int nbImg = 0;
-		Mat currentImage, preprocessedImage, imageToShow;
+		Mat currentImage, preprocessedImage;
 		while (DigFolder("images", currentImage))
 		{
 			Faces faces;
-			int angle = 30;
+			int angle = 10;
 			float alpha = 0;
 			Point2f center(currentImage.cols/2, currentImage.rows/2);
 
+			cout << "Start processing" << endl;
 			for (int i=0; i<2*angle; i += 1)
 			{
 				if (i<angle)
@@ -63,8 +64,10 @@ public:
 				else
 					alpha = angle - i;
 
+				if (i % 4 == 0)
+					cout << "Search for angle " << alpha << endl;
+
 				// Preprocess
-				cout << "Preprocessing" << endl;
 				currentImage.copyTo(preprocessedImage);
 
 				Mat rot = getRotationMatrix2D(center, alpha, 1);
@@ -75,45 +78,61 @@ public:
 				Faces newFaces;
 				
 				// Find faces
-				cout << "Finding faces" << endl;
 				faceFinder.FindFaces(preprocessedImage, newFaces);
 
 				// Find eyes
 				cout << "Finding eyes" << endl;
 				for (Faces::iterator it = faces.begin(); it != faces.end(); ++it)
 					eyeFinder.FindEyes(preprocessedImage, *it);
-				cvtColor(preprocessedImage, imageToShow, COLOR_GRAY2RGB);
 
 				//identify redundancy
 				for (Faces::iterator it = newFaces.begin(); it != newFaces.end(); ++it)
 				{
 					bool match = false;
-					Point2f newCoord = Preprocessing::RotateDegree(Point2f(it->boundingBox.x, it->boundingBox.y), center, -alpha);
+					Point2f centerNewFace = Preprocessing::RotateDegree(Point2f(it->boundingBox.x + it->boundingBox.width/2, it->boundingBox.y + it->boundingBox.height/2), center, +alpha);
 					for (Faces::iterator it2 = faces.begin(); it2 != faces.end(); ++it2)
 					{
-						if (abs(it2->boundingBox.x - newCoord.x) < 50 && abs(it2->boundingBox.y - newCoord.y) < 50)
+						Point2f centerFace(it2->boundingBox.x + it2->boundingBox.width/2, it2->boundingBox.y + it2->boundingBox.height/2);
+						if (abs(centerFace.x - centerNewFace.x) < 30 && abs(centerFace.y - centerNewFace.y) < 30)
 						{
-							//it2->reliabilityFactor += it->reliabilityFactor;
+							it2->reliabilityFactor += it->reliabilityFactor;
 							match = true;
 							break;
 						}
 					}
 					if (!match)
 					{
-						it->boundingBox.x = newCoord.x;
-						it->boundingBox.y = newCoord.y;
+						it->boundingBox.x = centerNewFace.x - it->boundingBox.width/2;
+						it->boundingBox.y = centerNewFace.y - it->boundingBox.height/2;
 						faces.push_back(*it);
 					}
 					
 				}
+			}
 
-				// Detect faces orientation
-				cout << "Detecting orientations" << endl;
-				for (list<OrientationDetector*>::iterator it = orientationDetectors.begin(); it != orientationDetectors.end(); ++it)
+			// Detect faces orientation
+			cout << "Detecting orientations" << endl;
+			for (list<OrientationDetector*>::iterator it = orientationDetectors.begin(); it != orientationDetectors.end(); ++it)
+			{
+				for (Faces::iterator itFace = faces.begin(); itFace != faces.end(); ++itFace)
+					(*it)->DetectOrientation(currentImage, *itFace);
+			}
+
+			// Decision taking
+			cout << "Taking decisions:" << endl;
+			for (Faces::iterator it = faces.begin(); it != faces.end(); ++it)
+			{
+				VerdictDetection verdictDetection = DecisionTaker::DecideDetection(*it);
+				VerdictLooking verdictLooking = DecisionTaker::DecideLooking(*it);
+
+				// Display
+				cout << " - Face located at " << it->boundingBox.x << ", " << it->boundingBox.y << " is ";
+				if (verdictDetection == VerdictDetection::IS_A_FACE)
 				{
-					for (Faces::iterator itFace = newFaces.begin(); itFace != newFaces.end(); ++itFace)
-						(*it)->DetectOrientation(imageToShow, *itFace);
+					rectangle(currentImage, it->boundingBox, Scalar(0, 255, 0, 1), it->reliabilityFactor/10, 8, 0);
+					cout << "looking at the camera" << endl;
 				}
+<<<<<<< HEAD
 
 				// Decision taking
 				cout << "Taking decisions:" << endl;
@@ -136,20 +155,34 @@ public:
 
 					for (Eyes::iterator eye = face->eyes.begin(); eye != face->eyes.end(); ++eye)
 						rectangle(imageToShow, eye->boundingBox, Scalar(255, 0, 0, 1), eye->reliabilityFactor, 8, 0);
+=======
+				else if (verdictDetection == VerdictDetection::IS_NOT_A_FACE)
+				{
+					rectangle(currentImage, it->boundingBox, Scalar(0, 0, 255, 1), it->reliabilityFactor/10, 8, 0);
+					cout << "not looking at the camera" << endl;
+>>>>>>> fc492135aef1e50eaf798459b1700f625c706242
 				}
 
-				// Display
-				cout << "Processing done" << endl << endl;
-				namedWindow("Display Image", WINDOW_AUTOSIZE);
-				imshow("Display Image", imageToShow);
-				waitKey(1);
-				preprocessedImage.release();
-				imageToShow.release();
+				/*cout << " - Face located at " << it->boundingBox.x << ", " << it->boundingBox.y << " is ";
+				if (verdictLooking == VerdictLooking::LOOKING_AT_THE_CAMERA)
+				{
+					rectangle(currentImage, it->boundingBox, Scalar(0, 255, 0, 1), it->reliabilityFactor/10, 8, 0);
+					cout << "looking at the camera" << endl;
+				}
+				else if (verdictLooking == VerdictLooking::NOT_LOOKING_AT_THE_CAMERA)
+				{
+					rectangle(currentImage, it->boundingBox, Scalar(0, 0, 255, 1), it->reliabilityFactor/10, 8, 0);
+					cout << "not looking at the camera" << endl;
+				}*/
 			}
-			waitKey(1000);
+
+			// Display
+			cout << "Processing done" << endl << endl;
+			namedWindow("Display Image", WINDOW_AUTOSIZE);
+			imshow("Display Image", currentImage);
+			waitKey(0);
 			currentImage.release();
 			preprocessedImage.release();
-			imageToShow.release();
 			destroyAllWindows();
 			++nbImg;
 		}
