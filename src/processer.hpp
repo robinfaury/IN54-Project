@@ -6,6 +6,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <fstream>
 
 #include "facefinder.hpp"
 #include "eyefinder.hpp"
@@ -39,6 +40,8 @@ public:
 	}
 	void Run()
 	{
+		fstream outputEyes;
+
 		/* - - - - - Training - - - - - - - - - - - - - - - - - - - - */
 		cout << "Training..." << endl;
 		faceFinder.Train();
@@ -58,14 +61,10 @@ public:
 			Point2f center(currentImage.cols/2, currentImage.rows/2);
 
 			cout << "Start processing" << endl;
-			for (int i=0; i<=2*angle; i += 1)
+			for (int alpha = -angle; alpha <= angle; alpha += 1)
 			{
-				if (i<angle)
-					alpha = i;
-				else
-					alpha = angle - i;
 
-				if (i % 4 == 0)
+				if (alpha % 4 == 0)
 					cout << "Search for angle " << alpha << endl;
 
 				// Preprocess
@@ -79,7 +78,7 @@ public:
 				Faces newFaces;
 				
 				// Find faces
-				faceFinder.FindFaces(preprocessedImage, newFaces);
+				faceFinder.FindFaces(preprocessedImage, newFaces, alpha);
 
 				// Find eyes
 				for (Faces::iterator it = faces.begin(); it != faces.end(); ++it)
@@ -96,6 +95,7 @@ public:
 						if (abs(centerFace.x - centerNewFace.x) < 30 && abs(centerFace.y - centerNewFace.y) < 30)
 						{
 							it2->reliabilityFactor += it->reliabilityFactor;
+							it2->alphaMax = it->alphaMin;
 							match = true;
 							break;
 						}
@@ -149,9 +149,84 @@ public:
 					rectangle(currentImage, it->boundingBox, Scalar(0, 0, 255, 1), it->reliabilityFactor/10, 8, 0);
 					cout << "not looking at the camera" << endl;
 				}*/
-
+				Eye* best1 = 0;
+				Eye* best2 = 0;
+				Eye defaultEye(Rect(it->boundingBox.x, it->boundingBox.y, 0, 0));
+				defaultEye.reliabilityFactor = 0;
 				for (Eyes::iterator eye = it->eyes.begin(); eye != it->eyes.end(); ++eye)
+				{
 					rectangle(currentImage, eye->boundingBox, Scalar(255, 0, 0, 1), eye->reliabilityFactor / 8 + 1, 8, 0);
+					if (best1 == 0)
+					{
+						best1 = &(*eye);
+					}
+					else if (best2 == 0)
+					{
+						best2 = &(*eye);
+					}
+					else if (eye->reliabilityFactor > best2->reliabilityFactor)
+					{
+						best2 = &(*eye);
+					}
+					if (best1 != 0 && best2 != 0 && best1->reliabilityFactor < best2->reliabilityFactor)
+					{
+						Eye* bestT = best1;
+						best1 = best2;
+						best2 = bestT;
+					}
+					//outputEyes << 
+				}
+				if (best2 == 0)
+				{
+					best2 = &defaultEye;
+					if (best1 == 0)
+						best1 = &defaultEye;
+				}
+				outputEyes.open("data/outputeyes.txt", std::ios_base::app | std::ios_base::out);
+				if (verdictDetection == VerdictDetection::IS_A_FACE)
+					outputEyes << "1";
+				else
+					outputEyes << "0";
+				outputEyes << ", ";
+				outputEyes << it->alphaMin;
+				outputEyes << ", ";
+				outputEyes << it->alphaMax;
+				outputEyes << ", ";
+
+				outputEyes << it->boundingBox.x;
+				outputEyes << ", ";
+				outputEyes << it->boundingBox.y;
+				outputEyes << ", ";
+				outputEyes << it->boundingBox.width;
+				outputEyes << ", ";
+				outputEyes << it->boundingBox.height;
+				outputEyes << ", ";
+				outputEyes << it->reliabilityFactor;
+				outputEyes << ", ";
+
+				outputEyes << best1->boundingBox.x - it->boundingBox.x;
+				outputEyes << ", ";
+				outputEyes << best1->boundingBox.y - it->boundingBox.y;
+				outputEyes << ", ";
+				outputEyes << best1->boundingBox.width;
+				outputEyes << ", ";
+				outputEyes << best1->boundingBox.height;
+				outputEyes << ", ";
+				outputEyes << best1->reliabilityFactor;
+				outputEyes << ", ";
+
+				outputEyes << best2->boundingBox.x - it->boundingBox.x;
+				outputEyes << ", ";
+				outputEyes << best2->boundingBox.y - it->boundingBox.y;
+				outputEyes << ", ";
+				outputEyes << best2->boundingBox.width;
+				outputEyes << ", ";
+				outputEyes << best2->boundingBox.height;
+				outputEyes << ", ";
+				outputEyes << best2->reliabilityFactor;
+				outputEyes << ", " << endl;
+				outputEyes.close();
+
 			}
 
 			// Display
@@ -165,7 +240,7 @@ public:
 			
 			++nbImg;
 		}
-
+		outputEyes.close();
 		if (nbImg == 0)
 			cout << "No image data" << endl;
 	}

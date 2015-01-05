@@ -21,8 +21,10 @@ public:
 	Orientation orientation;
 	Eyes eyes;
 	int reliabilityFactor;
+	int alphaMin;
+	int alphaMax;
 public:
-	Face(Rect& rect) : boundingBox(rect), reliabilityFactor(1)
+	Face(Rect& rect, int alpha) : boundingBox(rect), reliabilityFactor(1), alphaMin(alpha), alphaMax(alpha)
 	{
 		
 	}

@@ -22,7 +22,7 @@ private:
 public:
 	void Train()
 	{
-		eyeClassifiers.push_back(EyeClassifier(1));
+		//eyeClassifiers.push_back(EyeClassifier(1));
 		eyeClassifiers.push_back(EyeClassifier(2));
 		eyeClassifiers.push_back(EyeClassifier(3));
 		eyeClassifiers.push_back(EyeClassifier(4));

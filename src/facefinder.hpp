@@ -34,7 +34,7 @@ public:
 		faceClassifiers.push_back(CascadeClassifier());
 		faceClassifiers.back().load("data/haarcascade_profileface.xml");
 	}
-	void FindFaces(const Mat& mat, Faces& faces)
+	void FindFaces(const Mat& mat, Faces& faces, int alpha)
 	{
 		Mat src = mat;
 
@@ -54,7 +54,7 @@ public:
 							intersectionFound = face;
 					}
 					if (intersectionFound == faces.end())
-						faces.push_back(*it);
+						faces.push_back(Face(*it, alpha));
 					else
 						intersectionFound->reliabilityFactor += 1;
 				}
