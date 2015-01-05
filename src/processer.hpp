@@ -52,12 +52,12 @@ public:
 		while (DigFolder("images", currentImage))
 		{
 			Faces faces;
-			int angle = 10;
+			int angle = 60;
 			float alpha = 0;
 			Point2f center(currentImage.cols/2, currentImage.rows/2);
 
 			cout << "Start processing" << endl;
-			for (int i=0; i<2*angle; i += 1)
+			for (int i=0; i<=2*angle; i += 1)
 			{
 				if (i<angle)
 					alpha = i;
@@ -81,9 +81,9 @@ public:
 				faceFinder.FindFaces(preprocessedImage, newFaces);
 
 				// Find eyes
-				cout << "Finding eyes" << endl;
+				/*cout << "Finding eyes" << endl;
 				for (Faces::iterator it = faces.begin(); it != faces.end(); ++it)
-					eyeFinder.FindEyes(preprocessedImage, *it);
+					eyeFinder.FindEyes(preprocessedImage, *it);*/
 
 				//identify redundancy
 				for (Faces::iterator it = newFaces.begin(); it != newFaces.end(); ++it)
