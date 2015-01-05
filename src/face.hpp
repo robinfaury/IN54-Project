@@ -24,7 +24,7 @@ public:
 public:
 	Face(Rect& rect) : boundingBox(rect), reliabilityFactor(1)
 	{
-
+		
 	}
 	~Face()
 	{

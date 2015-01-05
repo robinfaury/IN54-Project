@@ -117,22 +117,25 @@ public:
 
 				// Decision taking
 				cout << "Taking decisions:" << endl;
-				for (Faces::iterator it = newFaces.begin(); it != newFaces.end(); ++it)
+				for (Faces::iterator face = newFaces.begin(); face != newFaces.end(); ++face)
 				{
-					Verdict verdict = DecisionTaker::Decide(*it);
+					Verdict verdict = DecisionTaker::Decide(*face);
 
 					// Display
-					cout << " - Face located at " << it->boundingBox.x << ", " << it->boundingBox.y << " is ";
+					cout << " - Face located at " << face->boundingBox.x << ", " << face->boundingBox.y << " is ";
 					if (verdict == Verdict::LOOKING_AT_THE_CAMERA)
 					{
-						rectangle(imageToShow, it->boundingBox, Scalar(0, 255, 0, 1), it->reliabilityFactor, 8, 0);
+						rectangle(imageToShow, face->boundingBox, Scalar(0, 255, 0, 1), face->reliabilityFactor, 8, 0);
 						cout << "looking at the camera" << endl;
 					}
 					else if (verdict == Verdict::NOT_LOOKING_AT_THE_CAMERA)
 					{
-						rectangle(imageToShow, it->boundingBox, Scalar(0, 0, 255, 1), it->reliabilityFactor, 8, 0);
+						rectangle(imageToShow, face->boundingBox, Scalar(0, 0, 255, 1), face->reliabilityFactor, 8, 0);
 						cout << "not looking at the camera" << endl;
 					}
+
+					for (Eyes::iterator eye = face->eyes.begin(); eye != face->eyes.end(); ++eye)
+						rectangle(imageToShow, eye->boundingBox, Scalar(255, 0, 0, 1), eye->reliabilityFactor, 8, 0);
 				}
 
 				// Display
