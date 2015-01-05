@@ -52,7 +52,7 @@ public:
 		while (DigFolder("images", currentImage))
 		{
 			Faces faces;
-			int angle = 60;
+			int angle = 70;
 			float alpha = 0;
 			Point2f center(currentImage.cols/2, currentImage.rows/2);
 
@@ -159,6 +159,7 @@ public:
 			currentImage.release();
 			preprocessedImage.release();
 			destroyAllWindows();
+			
 			++nbImg;
 		}
 
