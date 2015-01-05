@@ -7,6 +7,7 @@
 #include <list>
 #include "str.hpp"
 #include "orientation.hpp"
+#include "eye.hpp"
 
 using namespace cv;
 using namespace std;
@@ -18,6 +19,7 @@ class Face
 public:
 	Rect boundingBox;
 	Orientation orientation;
+	Eyes eyes;
 	int reliabilityFactor;
 public:
 	Face(Rect& rect) : boundingBox(rect), reliabilityFactor(1)
