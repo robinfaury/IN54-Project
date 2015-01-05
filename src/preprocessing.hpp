@@ -28,8 +28,11 @@ public:
 	}
 	static Point2f RotateDegree(Point2f p1, Point2f p2, float alpha)
 	{
-		float dtx = (p1.x - p2.x), dty = (p1.y - p2.y), a = M_PI*alpha/180.0;
-		return Point2f(((p1.x-dtx)*cos(M_PI*alpha/180.0) - (p1.y-dty)*sin(a))+dtx, ((p1.x-dtx)*sin(M_PI*alpha/180.0) + (p1.y-dty)*cos(a))+dty);
+		float a = M_PI*alpha/180.0;
+		p1 = p1 - p2;
+		float x = (p1.x)*cos(a) - (p1.y)*sin(a);
+		float y = (p1.x)*sin(a) + (p1.y)*cos(a);
+		return Point2f(x, y)+p2;
 	}
 	static void Preprocess(Mat& mat, int angle)
 	{

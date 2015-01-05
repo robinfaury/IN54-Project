@@ -35,13 +35,13 @@ protected:
 
 		if (folder != newFolder)
 		{
-			current = 0;
+			current = 1;
 			folder = newFolder;
 		}
 
 		Str imgPath;
 
-		imgPath << folder << '/' << current << '.' << extension;
+		imgPath << folder << "/data (" << current << ")." << extension;
 		cout << "Loading img \"" << imgPath << "\"" << endl;
 		imgPath.AddEndStringChar();
 		mat = imread(imgPath.Get(), 1);
