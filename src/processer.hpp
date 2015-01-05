@@ -84,7 +84,6 @@ public:
 				cout << "Finding eyes" << endl;
 				for (Faces::iterator it = faces.begin(); it != faces.end(); ++it)
 					eyeFinder.FindEyes(preprocessedImage, *it);
-				cvtColor(preprocessedImage, imageToShow, COLOR_GRAY2RGB);
 
 				//identify redundancy
 				for (Faces::iterator it = newFaces.begin(); it != newFaces.end(); ++it)
