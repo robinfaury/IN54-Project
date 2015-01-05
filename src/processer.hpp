@@ -82,9 +82,8 @@ public:
 				faceFinder.FindFaces(preprocessedImage, newFaces);
 
 				// Find eyes
-				/*cout << "Finding eyes" << endl;
 				for (Faces::iterator it = faces.begin(); it != faces.end(); ++it)
-					eyeFinder.FindEyes(preprocessedImage, *it);*/
+					eyeFinder.FindEyes(preprocessedImage, *it);
 
 				//identify redundancy
 				for (Faces::iterator it = newFaces.begin(); it != newFaces.end(); ++it)

@@ -74,7 +74,7 @@ public:
 		}
 
 		float ratio = matFace.size[0] / 80.0f;
-		if (minVal < 0.07f)
+		if (minVal < 0.06f)
 			objects.push_back(Rect(matchLoc * ratio, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows) * ratio));
 		
 		rectangle(result, matchLoc * ratio, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows) * ratio, Scalar(127, 0, 0, 1), FILLED, 8, 0);
@@ -95,7 +95,7 @@ public:
 		}
 
 		ratio = matFace.size[0] / 80.0f;
-		if (minVal < 0.07f)
+		if (minVal < 0.06f)
 			objects.push_back(Rect(matchLoc * ratio, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows) * ratio));
 		/*rectangle(matFace, matchLoc * ratio, Point(matchLoc.x + templ.cols, matchLoc.y + templ.rows) * ratio, Scalar(0, 0, 0, 1), 1, 8, 0);
 		imshow("matFace", matFace);

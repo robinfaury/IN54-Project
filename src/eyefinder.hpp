@@ -35,6 +35,8 @@ public:
 	}
 	void FindEyes(const Mat& mat, Face& face)
 	{
+		if (face.boundingBox.x < 0 || face.boundingBox.y < 0 || face.boundingBox.width < 20 || face.boundingBox.height < 20)
+			return;
 		Mat matFace = mat(face.boundingBox);
 
 		vector<Rect> objects;
@@ -51,7 +53,7 @@ public:
 					for (Eyes::iterator eye = face.eyes.begin(); eye != face.eyes.end(); ++eye)
 					{
 						Rect intersectionArea = (*it) & eye->boundingBox;
-						if (intersectionArea.width > 4 && intersectionArea.height > 4)
+						if (intersectionArea.width > 0 && intersectionArea.height > 0)
 							intersectionFound = eye;
 					}
 					if (intersectionFound == face.eyes.end())
